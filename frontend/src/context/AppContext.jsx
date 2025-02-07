@@ -18,7 +18,7 @@ export const AppProvider = ({ children }) => {
 
     useEffect(() => {
         userQues();
-    }, [questions]);
+    }, []);
     
     useEffect(() => {
         setFilteredQuestions(questions.filter((question) => question.topic === selectedTopic));
@@ -50,6 +50,7 @@ export const AppProvider = ({ children }) => {
         try {
             const res = await axiosInstance.post(`/auth/login`, {email,password});
             setUser(res.data.user);
+            await userQues();
             toast.success('login successful');
             navigate('/');
         } catch (error) {
@@ -91,6 +92,7 @@ export const AppProvider = ({ children }) => {
             setLoading(true);
             const res = await axiosInstance.post('/ques/add', formData);
             toast.success('Question added');
+            await userQues();
             navigate('/')
         } catch (error) {
             console.log(error);

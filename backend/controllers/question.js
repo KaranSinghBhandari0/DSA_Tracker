@@ -1,33 +1,40 @@
 const Question = require('../models/question');
 
-const addQues = async (req,res) => {
+const addQues = async (req, res) => {
     try {
-        const {title, topic, link, notes} = req.body;
+        const { title, topic, link, notes } = req.body;
 
-        const existingQues = await Question.findOne({ 
-            $or: [
-                { title: title.trim() }, 
-                { link: link.trim() }
-            ]
-        });
+        if (!title || !topic) {
+            return res.status(400).json({ message: "Title and topic are required" });
+        }
+
+        const formattedTitle = title
+            .trim()
+            .toLowerCase()
+            .split(" ")
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+
+        const existingQues = await Question.findOne({ title: formattedTitle });
         if(existingQues) {
             return res.status(400).json({message: "Question already exist"});
         }
 
         const newQues = new Question({
-            title: title.trim(),
+            title: formattedTitle,
             topic: topic.trim(),
-            link: link.trim(),
+            link:  link.trim(),
             notes: notes.trim(),
             user: req.user._id,
-        })
+        });
+
         await newQues.save();
 
-        res.status(200).json({ message: 'Question added' });
+        res.status(200).json({ message: "Question added successfully" });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
-}
+};
 
 const questions = async (req,res) => {
     try {
@@ -39,25 +46,39 @@ const questions = async (req,res) => {
     }
 }
 
-const editQues = async (req,res) => {
+const editQues = async (req, res) => {
     try {
         const { id, title, link } = req.body;
+
+        // Find the existing question
         const ques = await Question.findById(id);
 
-        if(!ques) {
-            return res.status(404).json({ message: 'Question not found' });
+        let formattedTitle = ques.title;
+        if(title) {
+            formattedTitle = title
+                .trim()
+                .toLowerCase()
+                .split(" ")
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
+
+            const existingQues = await Question.findOne({ title: formattedTitle });
+
+            if (existingQues) {
+                return res.status(400).json({ message: "Title already exists" });
+            }
         }
 
-        ques.title = title || ques.title;
-        ques.link = link || ques.link;
+        ques.title = formattedTitle;
+        ques.link = link ? link.trim() : ques.link;
 
         await ques.save();
 
-        res.status(200).json({ message: 'Question Editted' });
+        res.status(200).json({ message: "Question edited successfully" });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
-}
+};
 
 const deleteQues = async (req,res) => {
     try {
