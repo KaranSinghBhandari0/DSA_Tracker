@@ -186,10 +186,22 @@ export const AppProvider = ({ children }) => {
         }
     };
 
+    // mark important
+    const markImp = async (id) => {
+        try {
+            const res = await axiosInstance.get(`/ques/markImp/${id}`);
+            toast.success(res.data.message);
+            await userQues();
+        } catch (error) {
+            console.error(error);
+            toast.error(error.response.data.message || "failed to mark as important");
+        }
+    };  
+
     return (
         <AppContext.Provider value={{ signup, login, logout, checkAuth, 
         loading, checkingAuth, user, questions, filteredQuestions, selectedTopic, setSelectedTopic, selectedQuestion, setSelectedQuestion,
-        addQues, userQues, saveNotes, search, deleteQues, editQues }}>
+        addQues, userQues, saveNotes, search, deleteQues, editQues, markImp }}>
             {children}
         </AppContext.Provider>
     );

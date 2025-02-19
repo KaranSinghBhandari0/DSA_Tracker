@@ -116,4 +116,31 @@ const editNotes = async (req,res) => {
     }
 }
 
-module.exports = { addQues, questions, editQues, deleteQues, editNotes };
+const markImp = async (req,res) => {
+    try {
+        const { id } = req.params;
+        console.log(id);
+
+        const question = await Question.findById(id);
+        if(!question) {
+            return res.status(404).json({message: "Question not found"});
+        }
+
+        if(question.important == true) {
+            question.important = false;
+            await question.save();
+    
+            return res.status(200).json({ message: 'Unmarked from important' });
+        }
+
+        question.important = true;
+        await question.save();
+
+        res.status(200).json({ message: 'marked as important' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+}
+
+module.exports = { addQues, questions, editQues, deleteQues, editNotes, markImp };

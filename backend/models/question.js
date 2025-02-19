@@ -19,6 +19,10 @@ const questionSchema = new mongoose.Schema({
     user: {
         type: String,
         required: [true, "user is required"]
+    },
+    important: {
+        type: Boolean,
+        default: false,
     }
 });
 

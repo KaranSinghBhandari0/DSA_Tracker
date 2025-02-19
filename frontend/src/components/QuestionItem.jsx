@@ -1,12 +1,12 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NotepadText, EllipsisVertical } from 'lucide-react';
+import { NotepadText, EllipsisVertical, Star } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import Spinner from '../components/Spinner';
 
 export default function QuestionItem({ question, index, setIsModalOpen }) {
     const navigate = useNavigate();
-    const { setSelectedQuestion, deleteQues, loading } = useContext(AppContext);
+    const { setSelectedQuestion, deleteQues, loading, markImp } = useContext(AppContext);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -37,6 +37,14 @@ export default function QuestionItem({ question, index, setIsModalOpen }) {
                 <p className="text-xs md:text-sm truncate font-semibold text-slate-700">{question.title}</p>
             </div>
             <div className="flex space-x-4 items-center ml-3">
+                {
+                    question.important ?
+                    <i className="fa-solid fa-star text-orange-500 cursor-pointer" 
+                    onClick={()=> markImp(question._id)}></i>
+                    :
+                    <i className="fa-regular fa-star text-orange-500 cursor-pointer" 
+                    onClick={()=> markImp(question._id)}></i>
+                }
                 <a
                     href={question.link}
                     target="_blank"
